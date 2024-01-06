@@ -68,5 +68,14 @@ export function listenerKaraokola(io, socket) {
     io.emit('playVideo', resmsg);
   })
 
+  socket.on('videoPlay', async (msg) => {
+    console.log('[Video play evento]')
+    io.emit('videoPlay', msg);
+  })
+
+  socket.on('ocultarBarra', async (msg) => {
+    console.log('[Ocultar barra]')
+    io.emit('ocultarBarra', msg);
+  })
 
 }
