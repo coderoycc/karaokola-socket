@@ -56,7 +56,12 @@ export function listenerKaraokola(io, socket) {
 
   socket.on('reloadVideo', async (msg) => {
     console.log('[Reload]')
-    io.emit('reloadVideo', msg);
+    if(msg == ''){
+      io.emit('reloadVideo', msg);
+    }else{
+      const resMsg = await initVideoActual();
+      io.emit('playVideo', resMsg)
+    }
   });
 
   socket.on('nextVideo', async (msg) => {
@@ -68,14 +73,19 @@ export function listenerKaraokola(io, socket) {
     io.emit('playVideo', resmsg);
   })
 
-  socket.on('videoPlay', async (msg) => {
-    console.log('[Video play evento]')
-    io.emit('videoPlay', msg);
-  })
+  // socket.on('videoPlay', async (msg) => {
+  //   console.log('[Video play evento]')
+  //   io.emit('videoPlay', msg);
+  // })
 
   socket.on('ocultarBarra', async (msg) => {
     console.log('[Ocultar barra]')
     io.emit('ocultarBarra', msg);
+  });
+
+  socket.on('videoVolume', async (msg) => {
+    console.log('[Video volume]')
+    io.emit('videoVolume', msg);
   })
 
 }

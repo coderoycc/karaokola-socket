@@ -3,6 +3,7 @@ import {Server as WebSocketServer} from 'socket.io';
 import http from 'http';
 import cors from 'cors'
 import { listenerKaraokola } from './karaokola/karaokola.js';
+import { RedisClient } from './db/redis.js';
 
 const app = express();
 const httpServer = http.createServer(app);
@@ -14,7 +15,13 @@ const io = new WebSocketServer(httpServer, {
   }
 });
 app.use(cors());
-
+(async ()=>{
+  const client = await new RedisClient().connect();
+  console.log('INICIANDO REDIS');
+  let res = await client.set('karaokola','');
+  res += await client.set('currentKaraokola','');
+  console.log('[OK]: ', res)
+})();
 // Servidor web (rutas)
 app.use('/', (req, res) => {
   console.log('Ruta raiz');

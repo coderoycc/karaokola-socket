@@ -21,7 +21,7 @@ export async function initVideoActual(){
     descripcion: ' Sin video actual',
     ruta: '',
     play: false,
-    volumen: 50
+    volumen: 80
   }
   try {
     const redis = await new RedisClient().connect();
@@ -81,28 +81,32 @@ export async function playVideo(){
   try {
     const redis = await new RedisClient().connect();
     let currentVideo = await redis.get('currentKaraokola');
-    currentVideo = JSON.parse(currentVideo)
-    if(currentVideo.id == '' || currentVideo.ruta == ''){
-      // sacamos un nuevo video de la lista
-      let videos = await redis.get('karaokola')
-      videos = JSON.parse(`[${videos}]`)
-      if(videos.length > 0){
-        currentVideo = {...videos.shift(), play:true, volumen: 50}
-        await redis.set('currentKaraokola', JSON.stringify(currentVideo))
-        videos = JSON.stringify(videos)
-        videos = videos.replace('[','').replace(']','')
-        await redis.set('karaokola', videos)
-        return currentVideo;
+    if(currentVideo != ''){
+      currentVideo = JSON.parse(currentVideo)
+      if(currentVideo.id == '' || currentVideo.ruta == ''){
+        // sacamos un nuevo video de la lista
+        let videos = await redis.get('karaokola')
+        videos = JSON.parse(`[${videos}]`)
+        if(videos.length > 0){
+          currentVideo = {...videos.shift(), play:true, volumen: 80}
+          await redis.set('currentKaraokola', JSON.stringify(currentVideo))
+          videos = JSON.stringify(videos)
+          videos = videos.replace('[','').replace(']','')
+          await redis.set('karaokola', videos)
+          return currentVideo;
+        }else{
+          return '';  // cadena vacia cuando no exista videos en cola
+        }
       }else{
-        return '';  // cadena vacia cuando no exista videos en cola
+        currentVideo.play = !currentVideo.play;
+        console.log('currentVideo PLAY', currentVideo)
+        currentVideo = JSON.stringify(currentVideo)
+        await redis.set('currentKaraokola', currentVideo)
       }
+      return currentVideo;
     }else{
-      currentVideo.play = !currentVideo.play;
-      console.log('currentVideo PLAY', currentVideo)
-      currentVideo = JSON.stringify(currentVideo)
-      await redis.set('currentKaraokola', currentVideo)
+      return '';
     }
-    return currentVideo;
   } catch (error) {
     console.log('[ERROR KARAOKOLA] get current video', error)
   }
@@ -114,7 +118,7 @@ export async function nextVideo(){
     let videos = await getListKaraokola();
     videos = JSON.parse(videos);
     if(videos.length > 0){
-      let currentVideo = {...videos.shift(), play: true, volumen: 50 };
+      let currentVideo = {...videos.shift(), play: true, volumen: 80 };
       console.log('VIDEO a reproducir', currentVideo)
       currentVideo = JSON.stringify(currentVideo)
       const redis = await new RedisClient().connect();
