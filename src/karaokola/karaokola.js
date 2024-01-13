@@ -66,6 +66,7 @@ export function listenerKaraokola(io, socket) {
 
   socket.on('nextVideo', async (msg) => {
     console.log('[Next video]')
+    io.emit('videoPlay', 'pause')
     const resmsg = await nextVideo();
     io.emit('currentVideo', resmsg);
     const canciones = await getListKaraokola();
@@ -73,10 +74,10 @@ export function listenerKaraokola(io, socket) {
     io.emit('playVideo', resmsg);
   })
 
-  // socket.on('videoPlay', async (msg) => {
-  //   console.log('[Video play evento]')
-  //   io.emit('videoPlay', msg);
-  // })
+  socket.on('videoPlay', async (msg) => {
+    console.log('[Video play evento]')
+    io.emit('videoPlay', msg);
+  })
 
   socket.on('ocultarBarra', async (msg) => {
     console.log('[Ocultar barra]')
